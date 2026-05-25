@@ -21,17 +21,21 @@ type PerfStatMetricsCollector struct {
 }
 
 func NewPerfStatMetricsCollector() *PerfStatMetricsCollector {
+	return NewPerfStatMetricsCollectorWithLabels(prometheus.Labels{})
+}
+
+func NewPerfStatMetricsCollectorWithLabels(labels prometheus.Labels) *PerfStatMetricsCollector {
 	return &PerfStatMetricsCollector{
-		minTimeMs:        prometheus.NewDesc("perfstat_minTimeMs", "Global Min(ms)", variableLabels(), constLabels()),
-		minTimeSampleMs:  prometheus.NewDesc("perfstat_minTimeSampleMs", "Min(ms)", variableLabels(), constLabels()),
-		avgTimeMs:        prometheus.NewDesc("perfstat_avgTimeMs", "Global Avg(ms)", variableLabels(), constLabels()),
-		avgTimeSampleMs:  prometheus.NewDesc("perfstat_avgTimeSampleMs", "Avg(ms)", variableLabels(), constLabels()),
-		maxTimeMs:        prometheus.NewDesc("perfstat_maxTimeMs", "Global Max(ms)", variableLabels(), constLabels()),
-		maxTimeSampleMs:  prometheus.NewDesc("perfstat_maxTimeSampleMs", "Max(ms)", variableLabels(), constLabels()),
-		totalTimeSec:     prometheus.NewDesc("perfstat_totalTimeSec", "Total(s)", variableLabels(), constLabels()),
-		leapsCount:       prometheus.NewDesc("perfstat_leapsCount", "Total Leaps", variableLabels(), constLabels()),
-		leapsCountSample: prometheus.NewDesc("perfstat_leapsCountSample", "Leaps", variableLabels(), constLabels()),
-		peersCount:       prometheus.NewDesc("perfstat_peersCount", "Peers", variableLabels(), constLabels()),
+		minTimeMs:        prometheus.NewDesc("perfstat_minTimeMs", "Global Min(ms)", []string{"type", "name"}, labels),
+		minTimeSampleMs:  prometheus.NewDesc("perfstat_minTimeSampleMs", "Min(ms)", []string{"type", "name"}, labels),
+		avgTimeMs:        prometheus.NewDesc("perfstat_avgTimeMs", "Global Avg(ms)", []string{"type", "name"}, labels),
+		avgTimeSampleMs:  prometheus.NewDesc("perfstat_avgTimeSampleMs", "Avg(ms)", []string{"type", "name"}, labels),
+		maxTimeMs:        prometheus.NewDesc("perfstat_maxTimeMs", "Global Max(ms)", []string{"type", "name"}, labels),
+		maxTimeSampleMs:  prometheus.NewDesc("perfstat_maxTimeSampleMs", "Max(ms)", []string{"type", "name"}, labels),
+		totalTimeSec:     prometheus.NewDesc("perfstat_totalTimeSec", "Total(s)", []string{"type", "name"}, labels),
+		leapsCount:       prometheus.NewDesc("perfstat_leapsCount", "Total Leaps", []string{"type", "name"}, labels),
+		leapsCountSample: prometheus.NewDesc("perfstat_leapsCountSample", "Leaps", []string{"type", "name"}, labels),
+		peersCount:       prometheus.NewDesc("perfstat_peersCount", "Peers", []string{"type", "name"}, labels),
 	}
 }
 
@@ -58,18 +62,10 @@ func (c *PerfStatMetricsCollector) Collect(ch chan<- prometheus.Metric) {
 			ch <- prometheus.MustNewConstMetric(c.avgTimeSampleMs, prometheus.GaugeValue, stat.GetAvgTimeSampleMs(), typ, name)
 			ch <- prometheus.MustNewConstMetric(c.maxTimeMs, prometheus.GaugeValue, stat.GetMaxTimeMs(), typ, name)
 			ch <- prometheus.MustNewConstMetric(c.maxTimeSampleMs, prometheus.GaugeValue, stat.GetMaxTimeSampleMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.totalTimeSec, prometheus.GaugeValue, math.Round(stat.GetTotalTimeMs()/1000), typ, name)
+			ch <- prometheus.MustNewConstMetric(c.totalTimeSec, prometheus.GaugeValue, math.Round(stat.GetTotalTimeMs()/1000.0*100)/100, typ, name)
 			ch <- prometheus.MustNewConstMetric(c.leapsCount, prometheus.GaugeValue, float64(stat.GetLeapsCount()), typ, name)
 			ch <- prometheus.MustNewConstMetric(c.leapsCountSample, prometheus.GaugeValue, float64(stat.GetLeapsCountSample()), typ, name)
 			ch <- prometheus.MustNewConstMetric(c.peersCount, prometheus.GaugeValue, float64(stat.GetPeersCount()), typ, name)
 		}
 	}
-}
-
-func variableLabels() []string {
-	return []string{"type", "name"}
-}
-
-func constLabels() prometheus.Labels {
-	return prometheus.Labels{"env": "..."}
 }
