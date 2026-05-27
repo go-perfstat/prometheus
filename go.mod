@@ -3,7 +3,7 @@ module github.com/go-perfstat/prometheus
 go 1.26.2
 
 require (
-	github.com/go-perfstat/go v1.0.5
+	github.com/go-perfstat/go v1.0.7
 	github.com/prometheus/client_golang v1.23.2
 )
 
