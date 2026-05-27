@@ -39,33 +39,33 @@ func NewPerfStatMetricsCollectorWithLabels(labels prometheus.Labels) *PerfStatMe
 	}
 }
 
-func (c *PerfStatMetricsCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- c.minTimeMs
-	ch <- c.minTimeSampleMs
-	ch <- c.avgTimeMs
-	ch <- c.avgTimeSampleMs
-	ch <- c.maxTimeMs
-	ch <- c.maxTimeSampleMs
-	ch <- c.totalTimeSec
-	ch <- c.leapsCount
-	ch <- c.leapsCountSample
-	ch <- c.peersCount
+func (this *PerfStatMetricsCollector) Describe(ch chan<- *prometheus.Desc) {
+	ch <- this.minTimeMs
+	ch <- this.minTimeSampleMs
+	ch <- this.avgTimeMs
+	ch <- this.avgTimeSampleMs
+	ch <- this.maxTimeMs
+	ch <- this.maxTimeSampleMs
+	ch <- this.totalTimeSec
+	ch <- this.leapsCount
+	ch <- this.leapsCountSample
+	ch <- this.peersCount
 }
 
-func (c *PerfStatMetricsCollector) Collect(ch chan<- prometheus.Metric) {
+func (this *PerfStatMetricsCollector) Collect(ch chan<- prometheus.Metric) {
 	stats := perfstat.GetAll()
 	for typ, names := range stats {
 		for name, stat := range names {
-			ch <- prometheus.MustNewConstMetric(c.minTimeMs, prometheus.GaugeValue, stat.GetMinTimeMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.minTimeSampleMs, prometheus.GaugeValue, stat.GetMinTimeSampleMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.avgTimeMs, prometheus.GaugeValue, stat.GetAvgTimeMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.avgTimeSampleMs, prometheus.GaugeValue, stat.GetAvgTimeSampleMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.maxTimeMs, prometheus.GaugeValue, stat.GetMaxTimeMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.maxTimeSampleMs, prometheus.GaugeValue, stat.GetMaxTimeSampleMs(), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.totalTimeSec, prometheus.GaugeValue, math.Round(stat.GetTotalTimeMs()/1000.0*100)/100, typ, name)
-			ch <- prometheus.MustNewConstMetric(c.leapsCount, prometheus.GaugeValue, float64(stat.GetLeapsCount()), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.leapsCountSample, prometheus.GaugeValue, float64(stat.GetLeapsCountSample()), typ, name)
-			ch <- prometheus.MustNewConstMetric(c.peersCount, prometheus.GaugeValue, float64(stat.GetPeersCount()), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.minTimeMs, prometheus.GaugeValue, stat.GetMinTimeMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.minTimeSampleMs, prometheus.GaugeValue, stat.GetMinTimeSampleMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.avgTimeMs, prometheus.GaugeValue, stat.GetAvgTimeMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.avgTimeSampleMs, prometheus.GaugeValue, stat.GetAvgTimeSampleMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.maxTimeMs, prometheus.GaugeValue, stat.GetMaxTimeMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.maxTimeSampleMs, prometheus.GaugeValue, stat.GetMaxTimeSampleMs(), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.totalTimeSec, prometheus.GaugeValue, math.Round(stat.GetTotalTimeMs()/1000.0*100)/100, typ, name)
+			ch <- prometheus.MustNewConstMetric(this.leapsCount, prometheus.GaugeValue, float64(stat.GetLeapsCount()), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.leapsCountSample, prometheus.GaugeValue, float64(stat.GetLeapsCountSample()), typ, name)
+			ch <- prometheus.MustNewConstMetric(this.peersCount, prometheus.GaugeValue, float64(stat.GetPeersCount()), typ, name)
 		}
 	}
 }
